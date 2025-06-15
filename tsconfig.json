@@ -10,7 +10,8 @@
       "@shared/*": ["shared/*"],
       "@pages/*": ["pages/*"],
       "@widgets/*": ["widgets/*"],
-      "@processes/*": ["processes/*"]
+      "@processes/*": ["processes/*"],
+      "@assets/*": ["assets/*"]
     }
   }
 }
