@@ -1,11 +1,13 @@
-import { createContext, type SetStateAction, type Dispatch } from "react";
+import { createContext, type Dispatch } from "react";
 import type { Action } from "./reducer";
 
+export type Theme = "light" | "dark";
+
 export type ContextState = {
-  theme: string;
+  theme: Theme;
 };
 
-type ContextType = {
+export type ContextType = {
   state: ContextState;
   dispatch: Dispatch<Action>;
 };

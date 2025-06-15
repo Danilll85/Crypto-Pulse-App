@@ -1,38 +1,60 @@
-import { Context } from "@app/providers/theme";
-import { useContext, useEffect } from "react";
-import { NavbarWrapper, LogoWrapper, LogoImage } from "./styles";
-import Logo_Dark from "@assets/Logo_Dark.svg";
-import Logo_Light from "@assets/Logo_Light.svg";
+import { useState } from "react";
+import { NavbarWrapper, ThemeWrapper, ThemeImage } from "./styles";
+import { FormControl, MenuItem, Select, type SelectChangeEvent } from "@mui/material";
+import { Logo } from "@shared/ui/logo";
+import { useTheme } from "@shared/lib/hooks/useTheme";
+import Bulb_Dark from "@assets/Bulb_Dark.svg";
+import Bulb_Light from "@assets/Bulb_Light.svg";
 
 export const Navbar = () => {
-  const context = useContext(Context);
+  const [language, setLanguage] = useState("English");
+  const { theme, toggleTheme } = useTheme();
 
-  useEffect(() => {
-    console.log(context.state.theme);
-  }, [context.state.theme]);
-
-  const insertLogoImage = () => {
-    const currentTheme: string = context.state.theme;
-
-    if (currentTheme === "light") {
-      return Logo_Light;
+  const insertThemeImage = () => {
+    if (theme === "light") {
+      return Bulb_Light;
     }
 
-    return Logo_Dark;
+    return Bulb_Dark;
   };
 
   const handleChangeTheme = () => {
-    console.log(context.state.theme);
-    context.dispatch({ type: "CHANGE_THEME" });
+    toggleTheme();
+  };
+
+  const handleLanguageChange = (e: SelectChangeEvent) => {
+    setLanguage(e.target.value);
   };
 
   return (
-    <NavbarWrapper $theme={context.state.theme}>
-      <LogoWrapper>
-        Crypto Pulse
-        <LogoImage src={insertLogoImage()} />
-      </LogoWrapper>
-      <button onClick={handleChangeTheme}>change</button>
+    <NavbarWrapper $theme={theme}>
+      <Logo />
+
+      <ThemeWrapper onClick={handleChangeTheme}>
+        <ThemeImage src={insertThemeImage()} />
+        {theme}
+      </ThemeWrapper>
+
+      <FormControl sx={{ m: 1, minWidth: 120 }}>
+        <Select
+          labelId="demo-simple-select-helper-label"
+          id="demo-simple-select-helper"
+          value={language}
+          defaultValue={language}
+          onChange={handleLanguageChange}
+        >
+          <MenuItem value="">
+            <em>Choose Language</em>
+          </MenuItem>
+          <MenuItem value={"English"}>English</MenuItem>
+          <MenuItem value={"Russian"}>Русский</MenuItem>
+        </Select>
+      </FormControl>
     </NavbarWrapper>
   );
 };
+
+/* to-do
+  merge ThemeWrapper and ChooseLanguage in one SettingsComponent
+  localization
+*/
