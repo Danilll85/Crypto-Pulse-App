@@ -1,7 +1,6 @@
 import styled from "@emotion/styled";
 
 const ThemeWrapper = styled.div`
-  outline: 1px solid black;
   font-size: 1rem;
   padding: 1rem;
   display: flex;

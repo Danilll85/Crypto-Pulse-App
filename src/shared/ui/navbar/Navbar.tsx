@@ -16,7 +16,7 @@ export const Navbar = () => {
       <Navigation />
       <SettingsWrapper>
         <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
-        <LanguageToggle props={{ language, setLanguage }} />
+        <LanguageToggle language={language} setLanguage={setLanguage} />
       </SettingsWrapper>
     </NavbarWrapper>
   );

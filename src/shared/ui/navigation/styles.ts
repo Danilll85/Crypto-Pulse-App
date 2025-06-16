@@ -4,7 +4,7 @@ import { NavLink } from "react-router-dom";
 const NavigationWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 7rem;
 `;
 
 const NavItem = styled.div`

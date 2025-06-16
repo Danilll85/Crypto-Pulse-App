@@ -1,24 +1,33 @@
-import { FormControl, MenuItem, Select, type SelectChangeEvent } from "@mui/material";
+import { StyledFormControl, StyledSelect, StyledMenuItem } from "./styles";
+import type { Props } from "./Language.types";
+import { useEffect } from "react";
 
-export const LanguageToggle = ({ props }: any) => {
-  const handleLanguageChange = (e: SelectChangeEvent) => {
-    props.setLanguage(e.target.value);
+export const LanguageToggle = ({ language, setLanguage }: Props) => {
+  const handleLanguageChange = (e: any) => {
+    setLanguage(e.target.value);
   };
+
+  useEffect(() => {
+    console.log(language);
+  }, []);
   return (
-    <FormControl sx={{ m: 1, minWidth: 120 }}>
-      <Select
-        labelId="demo-simple-select-helper-label"
-        id="demo-simple-select-helper"
-        value={props.language}
-        defaultValue={props.language}
+    <StyledFormControl>
+      <StyledSelect
+        value={language}
+        defaultValue={language}
         onChange={handleLanguageChange}
+        MenuProps={{
+          PaperProps: {
+            style: {
+              minWidth: 120,
+              maxWidth: 120,
+            },
+          },
+        }}
       >
-        <MenuItem value="">
-          <em>Choose Language</em>
-        </MenuItem>
-        <MenuItem value={"English"}>English</MenuItem>
-        <MenuItem value={"Russian"}>Русский</MenuItem>
-      </Select>
-    </FormControl>
+        <StyledMenuItem value="English">English</StyledMenuItem>
+        <StyledMenuItem value="Russian">Русский</StyledMenuItem>
+      </StyledSelect>
+    </StyledFormControl>
   );
 };
