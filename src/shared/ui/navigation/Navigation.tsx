@@ -1,7 +1,7 @@
 import type { Props } from "./Navigation.types";
 import { NavigationWrapper, NavItem, StyledNavLink } from "./styles";
 
-export const Navigation = ({ translate }: Props) => {
+export const Navigation = ({ theme, translate }: Props) => {
   return (
     <NavigationWrapper>
       <NavItem>

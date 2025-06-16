@@ -11,7 +11,7 @@ const NavbarWrapper = styled.div<{ $theme: string }>`
 const SettingsWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 1.5rem;
 `;
 
 export { NavbarWrapper, SettingsWrapper };

@@ -12,24 +12,28 @@ export const Navbar = () => {
   const { t, i18n, ready } = useTranslation();
 
   useEffect(() => {
-    console.log('Current language:', i18n.language)
-    console.log('Translation test:', t('light'));
-  }, [i18n.language, t])
+    console.log("Current language:", i18n.language);
+    console.log("Translation test:", t("light"));
+  }, [i18n.language, t]);
 
-  if(!ready) return <div>Loading...</div>;
+  if (!ready) return <div>Loading...</div>;
 
   return (
     <NavbarWrapper $theme={theme}>
       <Logo theme={theme} />
-      <Navigation translate={t}/>
+      <Navigation theme={theme} translate={t} />
       <SettingsWrapper>
-        <ThemeToggle theme={theme} toggleTheme={toggleTheme} translate={t}/>
-        <LanguageToggle language={i18n.language} setLanguage={(lang: string) => i18n.changeLanguage(lang)} />
+        <ThemeToggle theme={theme} toggleTheme={toggleTheme} translate={t} />
+        <LanguageToggle
+          language={i18n.language}
+          setLanguage={(lang: string) => i18n.changeLanguage(lang)}
+          theme={theme}
+        />
       </SettingsWrapper>
     </NavbarWrapper>
   );
 };
 
-/* to-do
-  localization
+/*
+styles for language toggle (depends on theme)
 */

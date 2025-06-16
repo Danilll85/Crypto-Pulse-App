@@ -2,7 +2,7 @@ import { StyledFormControl, StyledSelect, StyledMenuItem } from "./styles";
 import type { Props } from "./Language.types";
 import { useEffect, useState } from "react";
 
-export const LanguageToggle = ({ language, setLanguage }: Props) => {
+export const LanguageToggle = ({ language, setLanguage, theme }: Props) => {
   const [currentLanguage, setCurrentLanguage] = useState(language);
   const handleLanguageChange = (e: any) => {
     console.log(e.target.value);
