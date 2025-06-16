@@ -1,17 +1,17 @@
-import { NavLink, useNavigate } from "react-router-dom";
+import type { Props } from "./Navigation.types";
 import { NavigationWrapper, NavItem, StyledNavLink } from "./styles";
 
-export const Navigation = () => {
+export const Navigation = ({ translate }: Props) => {
   return (
     <NavigationWrapper>
       <NavItem>
-        <StyledNavLink to="/market">Market</StyledNavLink>
+        <StyledNavLink to="/market">{translate("Market")}</StyledNavLink>
       </NavItem>
       <NavItem>
-        <StyledNavLink to="/history">History</StyledNavLink>
+        <StyledNavLink to="/history">{translate("History")}</StyledNavLink>
       </NavItem>
       <NavItem>
-        <StyledNavLink to="/favourites">Favourites</StyledNavLink>
+        <StyledNavLink to="/favourites">{translate("Favourites")}</StyledNavLink>
       </NavItem>
     </NavigationWrapper>
   );

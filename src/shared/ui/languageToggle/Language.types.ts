@@ -3,5 +3,5 @@ import type { SelectProps } from "@mui/material";
 
 export interface Props {
   language: string;
-  setLanguage: Dispatch<SetStateAction<string>>;
+  setLanguage: (lang: string) => void;
 }

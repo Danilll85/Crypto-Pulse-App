@@ -1,6 +1,7 @@
 {
-  "translation": {
-    "light": "light",
-    "dark": "dark"
-  }
+  "light": "light",
+  "dark": "dark",
+  "Market": "Market",
+  "History": "History",
+  "Favourites": "Favourites"
 }

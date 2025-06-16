@@ -1,20 +1,25 @@
 import { StyledFormControl, StyledSelect, StyledMenuItem } from "./styles";
 import type { Props } from "./Language.types";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 
 export const LanguageToggle = ({ language, setLanguage }: Props) => {
+  const [currentLanguage, setCurrentLanguage] = useState(language);
   const handleLanguageChange = (e: any) => {
+    console.log(e.target.value);
+    
     setLanguage(e.target.value);
+    setCurrentLanguage(e.target.value);
   };
 
   useEffect(() => {
-    console.log(language);
+    console.log(`language is ${language}`);
+    console.log(`current language is ${language}`);
   }, []);
+
   return (
     <StyledFormControl>
       <StyledSelect
-        value={language}
-        defaultValue={language}
+        value={currentLanguage}
         onChange={handleLanguageChange}
         MenuProps={{
           PaperProps: {
@@ -25,8 +30,8 @@ export const LanguageToggle = ({ language, setLanguage }: Props) => {
           },
         }}
       >
-        <StyledMenuItem value="English">English</StyledMenuItem>
-        <StyledMenuItem value="Russian">Русский</StyledMenuItem>
+        <StyledMenuItem value="en">English</StyledMenuItem>
+        <StyledMenuItem value="ru">Русский</StyledMenuItem>
       </StyledSelect>
     </StyledFormControl>
   );
