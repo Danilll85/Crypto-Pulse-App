@@ -1,60 +1,27 @@
 import { useState } from "react";
-import { NavbarWrapper, ThemeWrapper, ThemeImage } from "./styles";
-import { FormControl, MenuItem, Select, type SelectChangeEvent } from "@mui/material";
+import { NavbarWrapper, SettingsWrapper } from "./styles";
 import { Logo } from "@shared/ui/logo";
 import { useTheme } from "@shared/lib/hooks/useTheme";
-import Bulb_Dark from "@assets/Bulb_Dark.svg";
-import Bulb_Light from "@assets/Bulb_Light.svg";
+import { ThemeToggle } from "@shared/ui/themeToggle";
+import { LanguageToggle } from "@shared/ui/languageToggle";
+import { Navigation } from "@shared/ui/navigation";
 
 export const Navbar = () => {
   const [language, setLanguage] = useState("English");
   const { theme, toggleTheme } = useTheme();
 
-  const insertThemeImage = () => {
-    if (theme === "light") {
-      return Bulb_Light;
-    }
-
-    return Bulb_Dark;
-  };
-
-  const handleChangeTheme = () => {
-    toggleTheme();
-  };
-
-  const handleLanguageChange = (e: SelectChangeEvent) => {
-    setLanguage(e.target.value);
-  };
-
   return (
     <NavbarWrapper $theme={theme}>
-      <Logo />
-
-      <ThemeWrapper onClick={handleChangeTheme}>
-        <ThemeImage src={insertThemeImage()} />
-        {theme}
-      </ThemeWrapper>
-
-      <FormControl sx={{ m: 1, minWidth: 120 }}>
-        <Select
-          labelId="demo-simple-select-helper-label"
-          id="demo-simple-select-helper"
-          value={language}
-          defaultValue={language}
-          onChange={handleLanguageChange}
-        >
-          <MenuItem value="">
-            <em>Choose Language</em>
-          </MenuItem>
-          <MenuItem value={"English"}>English</MenuItem>
-          <MenuItem value={"Russian"}>Русский</MenuItem>
-        </Select>
-      </FormControl>
+      <Logo theme={theme} />
+      <Navigation />
+      <SettingsWrapper>
+        <ThemeToggle theme={theme} toggleTheme={toggleTheme} />
+        <LanguageToggle props={{ language, setLanguage }} />
+      </SettingsWrapper>
     </NavbarWrapper>
   );
 };
 
 /* to-do
-  merge ThemeWrapper and ChooseLanguage in one SettingsComponent
   localization
 */
