@@ -2,8 +2,8 @@ import { useEffect } from "react";
 import { NavbarWrapper, SettingsWrapper } from "./styles";
 import { Logo } from "@shared/ui/logo";
 import { useTheme } from "@shared/lib/hooks/useTheme";
-import { ThemeToggle } from "@shared/ui/themeToggle";
-import { LanguageToggle } from "@shared/ui/languageToggle";
+import { ThemeToggle } from "@features/themeToggle";
+import { LanguageToggle } from "@features/languageToggle";
 import { Navigation } from "@shared/ui/navigation";
 import { useTranslation } from "react-i18next";
 

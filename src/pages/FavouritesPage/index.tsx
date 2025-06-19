@@ -1,4 +1,4 @@
-import { Navbar } from "@shared/ui/navbar";
+import { Navbar } from "@widgets/navbar";
 
 export const FavouritesPage = () => {
   return (
