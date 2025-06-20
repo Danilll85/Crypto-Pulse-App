@@ -1,3 +1,4 @@
+import { useEffect } from "react";
 import { CardWrapper, CurrencyWrapper, Title, Currency, Data } from "./styles";
 
 export const LiveCard = ({ categoryTitle, currencyTitle, data }: any) => {

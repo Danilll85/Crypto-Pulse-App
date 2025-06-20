@@ -6,15 +6,10 @@ export const LanguageToggle = ({ language, setLanguage, theme }: Props) => {
   const [currentLanguage, setCurrentLanguage] = useState(language);
   const handleLanguageChange = (e: any) => {
     console.log(e.target.value);
-    
+
     setLanguage(e.target.value);
     setCurrentLanguage(e.target.value);
   };
-
-  useEffect(() => {
-    console.log(`language is ${language}`);
-    console.log(`current language is ${language}`);
-  }, []);
 
   return (
     <StyledFormControl>

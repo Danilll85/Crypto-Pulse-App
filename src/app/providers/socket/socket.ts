@@ -1,57 +1,79 @@
-// socket.ts
-import { fetchKrakenToken } from "./token";
+// app/providers/socket/socket.ts
+import { WSURL } from "./config/WSURL";
+import { fetchKrakenToken } from "./token"; // <-- твой файл
 
-const URL = "wss://ws-auth.kraken.com/v2";
+type MessageHandler = (event: MessageEvent) => void;
 
-type MessageCallback = (msg: any) => void;
+class WebSocketService {
+  private socket: WebSocket | null = null;
+  private url = WSURL;
+  private listeners: MessageHandler[] = [];
+  private authToken: string | null = null;
 
-const subscribers: MessageCallback[] = [];
+  async init(): Promise<WebSocket | null> {
+    if (this.socket) return this.socket;
 
-export const subscribeToMessages = (cb: MessageCallback) => {
-  subscribers.push(cb);
-};
-
-(async function initSocket() {
-  const token = await fetchKrakenToken();
-  const socket = new WebSocket(URL);
-
-  socket.addEventListener("open", () => {
-    socket.send(
-      JSON.stringify({
-        method: "authenticate",
-        token,
-        req_id: 1,
-      })
-    );
-  });
-
-  socket.addEventListener("message", (event) => {
-    const message = JSON.parse(event.data);
-    console.log("Message from Kraken:", message);
-
-    // Уведомить всех подписчиков
-    subscribers.forEach((cb) => cb(message));
-
-    if (message.method === "authenticated") {
-      console.log("✅ Authenticated successfully");
-
-      socket.send(
-        JSON.stringify({
-          method: "subscribe",
-          params: {
-            channel: "ownTrades",
-          },
-          req_id: 2,
-        })
-      );
+    try {
+      this.authToken = await fetchKrakenToken();
+    } catch (error) {
+      console.error("Ошибка получения токена Kraken:", error);
+      return null;
     }
-  });
 
-  socket.addEventListener("error", (err) => {
-    console.error("WebSocket error:", err);
-  });
+    this.socket = new WebSocket(this.url);
 
-  socket.addEventListener("close", () => {
-    console.log("🔌 WebSocket closed");
-  });
-})();
+    this.socket.onopen = () => {
+      console.log("WebSocket connected");
+
+      if (this.authToken) {
+        this.socket!.send(
+          JSON.stringify({
+            event: "authenticate",
+            token: this.authToken,
+          })
+        );
+        console.log("Authentication sent");
+      }
+    };
+
+    this.socket.onmessage = (event) => {
+      this.listeners.forEach((cb) => cb(event));
+    };
+
+    this.socket.onerror = (error) => {
+      console.error("WebSocket error:", error);
+    };
+
+    this.socket.onclose = () => {
+      console.log("WebSocket disconnected");
+    };
+
+    return new Promise((resolve) => {
+      this.socket!.onopen = () => resolve(this.socket);
+    });
+  }
+
+  send(data: any) {
+    if (this.socket?.readyState === WebSocket.OPEN) {
+      this.socket.send(JSON.stringify(data));
+    } else {
+      console.warn("WebSocket not open. Cannot send:", data);
+    }
+  }
+
+  disconnect() {
+    this.socket?.close();
+    this.socket = null;
+    this.listeners = [];
+  }
+
+  subscribe(cb: MessageHandler) {
+    this.listeners.push(cb);
+  }
+
+  unsubscribe(cb: MessageHandler) {
+    this.listeners = this.listeners.filter((fn) => fn !== cb);
+  }
+}
+
+export const webSocket = new WebSocketService();

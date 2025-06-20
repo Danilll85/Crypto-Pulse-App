@@ -2,13 +2,8 @@ import { ThemeWrapper, ThemeImage } from "./styles";
 import Bulb_Dark from "@assets/Bulb_Dark.svg";
 import Bulb_Light from "@assets/Bulb_Light.svg";
 import type { Props } from "@features/themeToggle/ThemeToggle.types";
-import { useEffect } from "react";
 
 export const ThemeToggle = ({ theme, toggleTheme, translate }: Props) => {
-  useEffect(() => {
-    console.log(theme);
-  })
-
   const insertThemeImage = () => {
     if (theme === "light") {
       return Bulb_Light;

@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { NavbarWrapper, SettingsWrapper } from "./styles";
 import { Logo } from "@shared/ui/logo";
 import { useTheme } from "@shared/lib/hooks/useTheme";
@@ -11,10 +10,10 @@ export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
   const { t, i18n, ready } = useTranslation();
 
-  useEffect(() => {
-    console.log("Current language:", i18n.language);
-    console.log("Translation test:", t("light"));
-  }, [i18n.language, t]);
+  // useEffect(() => {
+  //   console.log("Current language:", i18n.language);
+  //   console.log("Translation test:", t("light"));
+  // }, [i18n.language, t]);
 
   if (!ready) return <div>Loading...</div>;
 
