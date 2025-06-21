@@ -1,1 +1,0 @@
-export const WSURL = "wss://ws-auth.kraken.com/v2";
