@@ -3,14 +3,15 @@ import styled from "@emotion/styled";
 const LogoWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 1rem;
-  font-size: 4rem;
+  gap: 12px;
+  font-size: 24px;
+  font-weight: bold;
   cursor: pointer;
 `;
 
 const LogoImage = styled.img`
-  width: 100px;
-  height: 100px;
+  width: 50px;
+  height: 50px;
 `;
 
 export { LogoWrapper, LogoImage };

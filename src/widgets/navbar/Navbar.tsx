@@ -5,6 +5,8 @@ import { ThemeToggle } from "@features/themeToggle";
 import { LanguageToggle } from "@features/languageToggle";
 import { Navigation } from "@shared/ui/navigation";
 import { useTranslation } from "react-i18next";
+import { colors } from "@shared/ui/styleColors";
+import { useEffect } from "react";
 
 export const Navbar = () => {
   const { theme, toggleTheme } = useTheme();
@@ -14,6 +16,10 @@ export const Navbar = () => {
   //   console.log("Current language:", i18n.language);
   //   console.log("Translation test:", t("light"));
   // }, [i18n.language, t]);
+
+  useEffect(() => {
+    document.body.style.background = theme === "light" ? colors.backgroundBodyLight : colors.backgroundBodyDark;
+  }, [theme]);
 
   if (!ready) return <div>Loading...</div>;
 

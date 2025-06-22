@@ -17,9 +17,8 @@ export const ThemeToggle = ({ theme, toggleTheme, translate }: Props) => {
   };
 
   return (
-    <ThemeWrapper onClick={handleChangeTheme}>
+    <ThemeWrapper $theme={theme} onClick={handleChangeTheme}>
       <ThemeImage src={insertThemeImage()} />
-      {translate(theme)}
     </ThemeWrapper>
   );
 };

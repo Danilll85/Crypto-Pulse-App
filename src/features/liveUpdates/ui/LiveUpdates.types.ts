@@ -8,12 +8,12 @@ export interface PriceData {
     low24h: number;
     vwap24h: number;
     ask: number;
-    askQty: number;
+    askQty?: number;
     bid: number;
-    bidQty: number;
+    bidQty?: number;
     spread: number;
     spreadPercent: number;
-    lastUpdate: number;
+    lastUpdate?: number;
     priceDirection: "up" | "down" | "neutral";
 }
 

@@ -1,24 +1,43 @@
 import { useState } from "react";
 import { useWebSocketPrices } from "../lib/hooks/useWebSocket";
 import type { PriceData } from "@features/liveUpdates/ui/LiveUpdates.types";
-import { getPriceDirectionSymbol, formatPrice, formatChange } from "@features/liveUpdates/lib/helpers";
-
 import { tableColumns } from "@features/liveUpdates/config/tableColumns";
+import { sortOptions } from "../config/sortOptions";
+import ReactPaginate from "react-paginate";
+import "./pagination.css";
+import {
+  ConnectionStatus,
+  Heading,
+  HeadingText,
+  InfoTable,
+  InfoTableContainer,
+  LastUpdate,
+  LiveUpdatesWrapper,
+  SearchBlock,
+} from "./styles";
+import { LiveCard } from "../../../entities/liveCard/ui/LiveCard";
+import { useTheme } from "@shared/lib/hooks/useTheme";
 
 export function LiveUpdates() {
-  const [sortBy, setSortBy] = useState<keyof PriceData>("symbol");
-  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("asc");
+  const { theme } = useTheme();
+  const [sortBy, setSortBy] = useState<keyof PriceData>("volume24h");
+  const [sortOrder, setSortOrder] = useState<"asc" | "desc">("desc");
   const [filter, setFilter] = useState("");
+  const [currentPage, setCurrentPage] = useState(0);
+  const itemsPerPage = 25;
 
   const { priceData, connectionStatus, reconnect, pairCount } = useWebSocketPrices();
 
-  const handleSort = (key: keyof PriceData) => {
-    if (sortBy === key) {
-      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
-    } else {
-      setSortBy(key);
-      setSortOrder("asc");
-    }
+  const handleSortChange = (value: string) => {
+    const selectedOption = sortOptions.find((option) => option.value === value);
+    setSortBy(value as keyof PriceData);
+    setSortOrder(selectedOption?.defaultOrder as "asc" | "desc");
+    setCurrentPage(0);
+  };
+
+  const handleSortOrderToggle = () => {
+    setSortOrder(sortOrder === "asc" ? "desc" : "asc");
+    setCurrentPage(0);
   };
 
   const filteredAndSortedData = Object.values(priceData)
@@ -34,85 +53,116 @@ export function LiveUpdates() {
       return ((aValue as number) - (bValue as number)) * multiplier;
     });
 
+  const pageCount = Math.ceil(filteredAndSortedData.length / itemsPerPage);
+  const offset = currentPage * itemsPerPage;
+  const currentItems = filteredAndSortedData.slice(offset, offset + itemsPerPage);
+
+  const handlePageClick = ({ selected }: { selected: number }) => {
+    setCurrentPage(selected);
+  };
+
   const getConnectionColor = () => {
     switch (connectionStatus) {
       case "connected":
-        return "green";
+        return theme == "light" ? "#94E9B8" : "#30b353";
       case "connecting":
-        return "yellow";
+        return "#FF9500";
       case "error":
-        return "red";
+        return theme == "light" ? "#FF3B30" : "#b33030";
       default:
-        return "gray";
+        return "#8E8E93";
     }
   };
 
   return (
-    <div>
+    <LiveUpdatesWrapper $theme={theme}>
       <div>
         <div>
-          <div>
-            <h1>Crypto Trading Dashboard</h1>
-            <div style={{ backgroundColor: getConnectionColor() }}>{connectionStatus.toUpperCase()}</div>
+          <Heading>
+            <HeadingText>Crypto Trading Dashboard</HeadingText>
+            <ConnectionStatus $theme={theme} style={{ backgroundColor: getConnectionColor() }}>
+              {connectionStatus.toUpperCase()}
+            </ConnectionStatus>
             {connectionStatus !== "connected" && <button onClick={reconnect}>Reconnect</button>}
-          </div>
-          <div>
+          </Heading>
+          <SearchBlock $theme={theme}>
             <input
               type="text"
               placeholder="Filter symbols..."
               value={filter}
-              onChange={(e) => setFilter(e.target.value)}
+              onChange={(e) => {
+                setFilter(e.target.value);
+                //setCurrentPage(0);
+              }}
             />
-            <div>{pairCount} pairs loaded</div>
-          </div>
+            <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
+              {sortOptions.map((option) => (
+                <option key={option.value} value={option.value}>
+                  {option.label}
+                </option>
+              ))}
+            </select>
+            <button onClick={handleSortOrderToggle} title={`Sort ${sortOrder === "asc" ? "ascending" : "descending"}`}>
+              {sortOrder === "asc" ? "↑ Asc" : "↓ Desc"}
+            </button>
+          </SearchBlock>
         </div>
 
-        <div>
-          <table>
+        <InfoTableContainer>
+          <InfoTable $theme={theme}>
             <thead>
               <tr>
                 {tableColumns.map(({ key, label }) => (
-                  <th key={key} onClick={() => handleSort(key as keyof PriceData)}>
-                    <div>
-                      {label}
-                      {sortBy === key && <span>{sortOrder === "asc" ? "↑" : "↓"}</span>}
-                    </div>
+                  <th key={key}>
+                    <div>{label}</div>
                   </th>
                 ))}
               </tr>
             </thead>
             <tbody>
-              {filteredAndSortedData.map((data) => (
-                <tr key={data.symbol}>
-                  <td>
-                    <div>
-                      <span>{data.symbol}</span>
-                      <span>{getPriceDirectionSymbol(data.priceDirection)}</span>
-                    </div>
-                  </td>
-                  <td>{formatPrice(data.price)}</td>
-                  <td>{formatChange(data.change24h)}</td>
-                  <td>{formatChange(data.changePercent24h, true)}</td>
-                  <td>{data.volume24h.toLocaleString()}</td>
-                  <td>{formatPrice(data.high24h)}</td>
-                  <td>{formatPrice(data.low24h)}</td>
-                  <td>{formatPrice(data.vwap24h)}</td>
-                  <td>{formatPrice(data.bid)}</td>
-                  <td>{formatPrice(data.ask)}</td>
-                  <td>{formatPrice(data.spread)}</td>
-                  <td>{data.spreadPercent.toFixed(3)}%</td>
-                </tr>
+              {currentItems.map((data) => (
+                <LiveCard
+                  key={data.symbol}
+                  symbol={data.symbol}
+                  spread={data.spread}
+                  high24h={data.high24h}
+                  price={data.price}
+                  changePercent24h={data.changePercent24h}
+                  change24h={data.change24h}
+                  volume24h={data.volume24h}
+                  low24h={data.low24h}
+                  vwap24h={data.vwap24h}
+                  ask={data.ask}
+                  bid={data.bid}
+                  spreadPercent={data.spreadPercent}
+                  priceDirection={data.priceDirection}
+                />
               ))}
             </tbody>
-          </table>
-        </div>
+          </InfoTable>
+        </InfoTableContainer>
 
         {filteredAndSortedData.length === 0 && (
           <div>{pairCount === 0 ? "Loading data..." : "No symbols match your filter"}</div>
         )}
 
-        <div>Last update: {new Date().toLocaleTimeString()}</div>
+        {pageCount > 1 && (
+          <ReactPaginate
+            previousLabel={"← Previous"}
+            nextLabel={"Next →"}
+            pageCount={pageCount}
+            onPageChange={handlePageClick}
+            containerClassName={"pagination"}
+            previousLinkClassName={"pagination__link"}
+            nextLinkClassName={"pagination__link"}
+            disabledClassName={"pagination__link--disabled"}
+            activeClassName={"pagination__link--active"}
+            forcePage={currentPage}
+          />
+        )}
+
+        <LastUpdate>Last update: {new Date().toLocaleTimeString()}</LastUpdate>
       </div>
-    </div>
+    </LiveUpdatesWrapper>
   );
 }

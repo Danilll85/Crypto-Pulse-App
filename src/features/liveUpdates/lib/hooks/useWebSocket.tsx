@@ -1,28 +1,11 @@
 import { useState, useCallback, useEffect, useRef } from "react";
 import type { PriceData, KrakenTickerData } from "@features/liveUpdates/ui/LiveUpdates.types";
+import { useFetchAssetData, type AssetPairData } from "./useFetchAssetData";
 
 const KRAKEN_WS_URL = "wss://ws.kraken.com/v2";
 
-const CRYPTO_PAIRS = [
-  "BTCUSD",
-  "ETH/USD",
-  "SOL/USD",
-  "ADA/USD",
-  "DOT/USD",
-  "MATIC/USD",
-  "AVAX/USD",
-  "LINK/USD",
-  "XRP/USD",
-  "LTC/USD",
-  "BCH/USD",
-  "UNI/USD",
-  "ATOM/USD",
-  "FIL/USD",
-  "ALGO/USD",
-  "NEAR/USD",
-];
-
 export const useWebSocketPrices = () => {
+  const { assets, loading: assetsLoading } = useFetchAssetData();
   const [priceData, setPriceData] = useState<Record<string, PriceData>>({});
   const [connectionStatus, setConnectionStatus] = useState<"connecting" | "connected" | "disconnected" | "error">(
     "connecting"
@@ -33,46 +16,64 @@ export const useWebSocketPrices = () => {
   const reconnectAttempts = useRef(0);
   const maxReconnectAttempts = 5;
 
-  const processTickerData = useCallback((tickerData: KrakenTickerData) => {
-    const symbol = tickerData.symbol;
+  const getSymbolPairs = useCallback(() => {
+    if (!assets) return [];
+    return Object.values(assets).map((asset) => asset.wsname);
+  }, [assets]);
 
-    if (symbol && tickerData.last !== undefined) {
-      const currentPrice = tickerData.last;
-      const ask = tickerData.ask || 0;
-      const bid = tickerData.bid || 0;
-      const spread = ask - bid;
-      const spreadPercent = ask > 0 ? (spread / ask) * 100 : 0;
+  const processTickerData = useCallback(
+    (tickerData: KrakenTickerData) => {
+      const symbol = tickerData.symbol;
+      if (!symbol || !assets) return;
 
-      setPriceData((prev) => {
-        const prevPrice = prev[symbol]?.price || currentPrice;
-        const priceDirection = currentPrice > prevPrice ? "up" : currentPrice < prevPrice ? "down" : "neutral";
+      // Find the asset pair data for this symbol
+      const assetPairEntry = Object.entries(assets).find(([_, assetData]) => assetData.wsname === symbol);
 
-        return {
-          ...prev,
-          [symbol]: {
-            symbol,
-            price: currentPrice,
-            change24h: tickerData.change || 0,
-            changePercent24h: tickerData.change_pct || 0,
-            volume24h: tickerData.volume || 0,
-            high24h: tickerData.high || 0,
-            low24h: tickerData.low || 0,
-            vwap24h: tickerData.vwap || 0,
-            ask: ask,
-            askQty: tickerData.ask_qty || 0,
-            bid: bid,
-            bidQty: tickerData.bid_qty || 0,
-            spread: spread,
-            spreadPercent: spreadPercent,
-            lastUpdate: Date.now(),
-            priceDirection,
-          },
-        };
-      });
-    }
-  }, []);
+      if (!assetPairEntry) return;
+
+      const [pairKey, assetData] = assetPairEntry;
+
+      if (tickerData.last !== undefined) {
+        const currentPrice = tickerData.last;
+        const ask = tickerData.ask || 0;
+        const bid = tickerData.bid || 0;
+        const spread = ask - bid;
+        const spreadPercent = ask > 0 ? (spread / ask) * 100 : 0;
+
+        setPriceData((prev) => {
+          const prevPrice = prev[assetData.base]?.price || currentPrice;
+          const priceDirection = currentPrice > prevPrice ? "up" : currentPrice < prevPrice ? "down" : "neutral";
+
+          return {
+            ...prev,
+            [assetData.base]: {
+              symbol: assetData.base,
+              price: currentPrice,
+              change24h: tickerData.change || 0,
+              changePercent24h: tickerData.change_pct || 0,
+              volume24h: tickerData.volume || 0,
+              high24h: tickerData.high || 0,
+              low24h: tickerData.low || 0,
+              vwap24h: tickerData.vwap || 0,
+              ask: ask,
+              askQty: tickerData.ask_qty || 0,
+              bid: bid,
+              bidQty: tickerData.bid_qty || 0,
+              spread: spread,
+              spreadPercent: spreadPercent,
+              lastUpdate: Date.now(),
+              priceDirection,
+            },
+          };
+        });
+      }
+    },
+    [assets]
+  );
 
   const connectWebSocket = useCallback(() => {
+    if (assetsLoading || !assets) return;
+
     try {
       setConnectionStatus("connecting");
       const ws = new WebSocket(KRAKEN_WS_URL);
@@ -85,7 +86,7 @@ export const useWebSocketPrices = () => {
           method: "subscribe",
           params: {
             channel: "ticker",
-            symbol: CRYPTO_PAIRS,
+            symbol: getSymbolPairs(),
           },
         };
         ws.send(JSON.stringify(subscribeMessage));
@@ -120,7 +121,7 @@ export const useWebSocketPrices = () => {
     } catch (err) {
       setConnectionStatus("error");
     }
-  }, [processTickerData]);
+  }, [assets, assetsLoading, getSymbolPairs, processTickerData]);
 
   const disconnect = useCallback(() => {
     if (reconnectTimeoutRef.current) {
@@ -141,11 +142,13 @@ export const useWebSocketPrices = () => {
   }, [connectWebSocket, disconnect]);
 
   useEffect(() => {
-    connectWebSocket();
+    if (!assetsLoading && assets) {
+      connectWebSocket();
+    }
     return () => {
       disconnect();
     };
-  }, [connectWebSocket, disconnect]);
+  }, [connectWebSocket, disconnect, assets, assetsLoading]);
 
   return {
     priceData,

@@ -1,13 +1,13 @@
 import styled from "@emotion/styled";
 import { FormControl, Select, MenuItem, type SelectProps } from "@mui/material";
+import { colors } from "@shared/ui/styleColors";
 
-const StyledFormControl = styled(FormControl)`
-  min-width: 8rem;
-`;
+const StyledFormControl = styled(FormControl)``;
 
-const StyledSelect = styled(Select)`
-  width: 100%;
-  max-width: 100%;
+const StyledSelect = styled(Select)<{ $theme: string }>`
+  width: 65px;
+  background-color: ${({ $theme }) => ($theme === "light" ? colors.backgroundLight : colors.backgroundDark)};
+  color: ${({ $theme }) => ($theme === "light" ? colors.textColorLight : colors.textColorDark)};
 
   & .MuiSelect-select {
     padding: 8px 32px 8px 12px;
@@ -18,7 +18,7 @@ const StyledSelect = styled(Select)`
   }
 
   & .MuiOutlinedInput-notchedOutline {
-    border: 1px solid #e0e0e0;
+    border: 1px solid ${({ $theme }) => ($theme === "light" ? colors.backgroundBodyLight : colors.backgroundBodyDark)};
   }
 `;
 

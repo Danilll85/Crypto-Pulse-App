@@ -15,7 +15,7 @@ export const routes = createBrowserRouter([
     element: <MarketPage />,
   },
   {
-    path: "/history",
+    path: "/history/:currencyName?",
     element: <HistoryPage />,
   },
   {

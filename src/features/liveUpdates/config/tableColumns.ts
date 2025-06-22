@@ -1,4 +1,5 @@
 export const tableColumns = [
+  { key: "favourite", label: "" },
   { key: "symbol", label: "Symbol" },
   { key: "price", label: "Price" },
   { key: "change24h", label: "24h Change" },

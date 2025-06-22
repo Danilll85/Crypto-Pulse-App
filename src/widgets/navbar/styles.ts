@@ -1,17 +1,26 @@
 import styled from "@emotion/styled";
+import { colors } from "@shared/ui/styleColors";
 
 const NavbarWrapper = styled.div<{ $theme: string }>`
   display: flex;
-  justify-content: space-between;
-  padding: 1rem 20rem;
-  background: ${({ $theme }) => ($theme === "light" ? "#f4f4f4" : "#171B26")};
-  color: ${({ $theme }) => ($theme === "light" ? "black" : "white")};
+  flex-wrap: wrap;
+  justify-content: space-around;
+  gap: 12px;
+  background: ${({ $theme }) => ($theme === "light" ? colors.backgroundLight : colors.backgroundDark)};
+  color: ${({ $theme }) => ($theme === "light" ? colors.textColorLight : colors.textColorDark)};
+
+  padding: 30px 5% 30px 5%;
+
+  @media (min-width: 769px) {
+    padding: 30px 10% 30px 10%;
+    justify-content: space-between;
+  }
 `;
 
 const SettingsWrapper = styled.div`
   display: flex;
   align-items: center;
-  gap: 1.5rem;
+  gap: 12px;
 `;
 
 export { NavbarWrapper, SettingsWrapper };

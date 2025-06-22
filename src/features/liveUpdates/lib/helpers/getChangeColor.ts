@@ -1,5 +1,6 @@
-export const getChangeColor = (change: number) => {
-  if (change > 0) return "text-green-600";
-  if (change < 0) return "text-red-600";
-  return "text-gray-600";
+import { colors } from "@shared/ui/styleColors";
+
+export const getChangeColor = (changePercent24h: number, theme: string) => {
+  if (changePercent24h > 0) return theme == "light" ? colors.greenLight : colors.greenDark;
+  else if (changePercent24h < 0) return theme == "light" ? colors.redLight : colors.redDark;
 };
