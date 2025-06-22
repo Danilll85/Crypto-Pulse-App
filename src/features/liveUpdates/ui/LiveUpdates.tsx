@@ -15,8 +15,9 @@ import {
   LiveUpdatesWrapper,
   SearchBlock,
 } from "./styles";
-import { LiveCard } from "../../../entities/liveCard/ui/LiveCard";
+import { LiveCard } from "@entities/liveCard/ui/LiveCard";
 import { useTheme } from "@shared/lib/hooks/useTheme";
+import { PriceNotifications } from "@features/notifications/priceNotification/priceNotification";
 
 export function LiveUpdates() {
   const { theme } = useTheme();
@@ -76,6 +77,15 @@ export function LiveUpdates() {
 
   return (
     <LiveUpdatesWrapper $theme={theme}>
+      <PriceNotifications
+        priceData={priceData}
+        theme={theme}
+        defaultThreshold={5}
+        maxNotifications={8}
+        autoCloseDelay={6000}
+        enableBrowserNotifications={true}
+      />
+
       <div>
         <div>
           <Heading>
@@ -85,6 +95,7 @@ export function LiveUpdates() {
             </ConnectionStatus>
             {connectionStatus !== "connected" && <button onClick={reconnect}>Reconnect</button>}
           </Heading>
+
           <SearchBlock $theme={theme}>
             <input
               type="text"
@@ -92,7 +103,7 @@ export function LiveUpdates() {
               value={filter}
               onChange={(e) => {
                 setFilter(e.target.value);
-                //setCurrentPage(0);
+                setCurrentPage(0);
               }}
             />
             <select value={sortBy} onChange={(e) => handleSortChange(e.target.value)}>
